@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin, faXTwitter } from '@fortawesome/free-brands-svg-icons';
@@ -8,6 +8,8 @@ import nodeIcon from '../assets/nodejs.svg';
 import pythonIcon from '../assets/python.svg';
 import expressIcon from '../assets/express.svg';
 import javaIcon from '../assets/java.svg';
+import myImage from '../../public/my-profile.png'
+import myResume from '../../public/Aditya-Mishra.pdf'
 // import cppIcon from '../assets/cpp.svg';
 
 
@@ -38,12 +40,25 @@ const Hero = () => {
   ];
 
 
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const techStack = [
-    { icon: reactIcon, name: "React", position: { top: '15%', left: '5%' } },
-    { icon: nodeIcon, name: "Node.js", position: { top: '30%', right: '5%' } },
-    { icon: pythonIcon, name: "Python", position: { top: '50%', left: '8%' } },
-    { icon: expressIcon, name: "Express", position: { top: '65%', right: '8%' } },
-    { icon: javaIcon, name: "Java", position: { top: '85%', left: '15%' } },
+    { icon: reactIcon, name: "React", position: { top: '15%', left: isMobile ? '-24%' : '5%' } },
+    { icon: nodeIcon, name: "Node.js", position: { top: '30%', right: isMobile ? '-24%' : '5%' } },
+    { icon: pythonIcon, name: "Python", position: { top: '50%', left: isMobile ? '-24%' : '8%' } },
+    { icon: expressIcon, name: "Express", position: { top: '65%', right: isMobile ? '-24%' : '8%' } },
+    { icon: javaIcon, name: "Java", position: { top: '85%', left: isMobile ? '-10%' : '15%' } },
     // { icon: cppIcon, name: "C++", position: { top: '75%', right: '15%' } },
   ];
 
@@ -97,7 +112,7 @@ const Hero = () => {
                 transition={{ duration: 2, repeat: Infinity, repeatType: "loop", ease: "easeInOut" }}
                 className="inline-block w-2 h-2 mr-2 rounded-full bg-green-400"
               ></motion.span>
-              <span className="text-sm text-gray-300"><a href="src/assets/Aditya Mishra.pdf" target='_blank'>Available for hire</a></span>
+              <span className="text-sm text-gray-300"><a href={myResume} target='_blank'>Available for hire</a></span>
             </motion.div>
             
             <motion.h1 
@@ -135,7 +150,7 @@ const Hero = () => {
               variants={textVariants}
               initial="hidden"
               animate="visible"
-              className="flex space-x-4"
+              className="flex flex-wrap gap-2 sm:gap-4"
             >
               <motion.a
                 whileHover={{ 
@@ -144,7 +159,7 @@ const Hero = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
                 href="#projects"
-                className="px-8 py-3 text-lg font-medium rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition duration-300"
+                className="px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-lg font-medium rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition duration-300"
               >
                 View My Work
               </motion.a>
@@ -155,7 +170,7 @@ const Hero = () => {
                 }}
                 whileTap={{ scale: 0.95 }}
                 href="#contact"
-                className="px-8 py-3 text-lg font-medium rounded-lg border-2 border-purple-600 text-white hover:bg-purple-600 transition duration-300"
+                className="px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-lg font-medium rounded-lg border-2 border-purple-600 text-white hover:bg-purple-600 transition duration-300"
               >
                 Contact Me
               </motion.a>
@@ -217,13 +232,13 @@ const Hero = () => {
                 delay: 0.3
               }}
               whileHover={{ scale: 1.03 }}
-              className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg shadow-purple-500/50 relative"
+              className="w-48 h-48 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple-500 shadow-lg shadow-purple-500/50 relative"
             >
               <motion.img 
                 initial={{ scale: 1.1 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 1 }}
-                src="src/assets/my-profile.png" 
+                src={myImage}
                 alt="Adii" 
                 className="w-full h-full object-cover"
               />
@@ -240,7 +255,11 @@ const Hero = () => {
               <motion.div
                 key={index}
                 className="absolute p-2 rounded-full bg-gray-800/80 border border-purple-500/50"
-                style={tech.position}
+                style={{
+                  ...tech.position,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 20
+                }}
                 initial={{ opacity: 0 }}
                 animate={{ 
                   opacity: [0.7, 1, 0.7],

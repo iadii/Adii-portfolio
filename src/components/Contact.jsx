@@ -1,12 +1,17 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
+
+  useEffect(() => {
+    emailjs.init("KZX8haICvARchPn5z");
+  }, []);
+  
   const form = useRef();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    from_name: '',
+    from_email: '',
     message: ''
   })
 
@@ -15,27 +20,33 @@ const Contact = () => {
     setFormData({ ...formData, [name]: value })
   }
 
+  const [status, setStatus] = useState({ type: '', message: '' });
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    setStatus({ type: 'loading', message: 'Sending...' });
     
-    const templateParams = {
-      from_name: formData.name,
-      from_email: formData.email,
-      message: formData.message,
-    }
-    
-    emailjs.send(
+    console.log("Form data being sent:", form.current);
+
+    emailjs.sendForm(
       'service_oxuf6za',
       'template_tz0jwk8',
-      templateParams,
+      form.current,
       'KZX8haICvARchPn5z'
     )
       .then((result) => {
         console.log('Email sent successfully:', result.text);
-        setFormData({ name: '', email: '', message: '' })
+        setFormData({ name: '', email: '', message: '' });
+        setStatus({ type: 'success', message: 'Message sent successfully!' });
+        
+        setTimeout(() => {
+          setStatus({ type: '', message: '' });
+        }, 5000);
       })
       .catch((error) => {
-        console.error('Error sending email:', error.text);
+
+        console.error('Error sending email:', error);
+        setStatus({ type: 'error', message: `Failed to send message: ` });
       });
   }
 
@@ -153,7 +164,8 @@ const Contact = () => {
                 <input 
                   type="text" 
                   id="name" 
-                  name="name"
+
+                  name="from_name" 
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full p-3 bg-gray-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-600"
@@ -166,7 +178,8 @@ const Contact = () => {
                 <input 
                   type="email" 
                   id="email" 
-                  name="email"
+
+                  name="from_email" 
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full p-3 bg-gray-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-600"
@@ -178,7 +191,8 @@ const Contact = () => {
                 <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-400">Your Message</label>
                 <textarea 
                   id="message" 
-                  name="message"
+
+                  name="message" 
                   value={formData.message}
                   onChange={handleChange}
                   rows="5" 
@@ -187,13 +201,30 @@ const Contact = () => {
                 ></textarea>
               </motion.div>
               
+              {status.message && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`text-sm font-medium p-2 rounded ${
+                    status.type === 'success' ? 'bg-green-500/20 text-green-400' : 
+                    status.type === 'error' ? 'bg-red-500/20 text-red-400' : 
+                    'bg-blue-500/20 text-blue-400'
+                  }`}
+                >
+                  {status.message}
+                </motion.div>
+              )}
+              
               <motion.button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-3 px-4 rounded-lg transition duration-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className={`w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium py-3 px-4 rounded-lg transition duration-300 ${
+                  status.type === 'loading' ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+                whileHover={{ scale: status.type !== 'loading' ? 1.02 : 1 }}
+                whileTap={{ scale: status.type !== 'loading' ? 0.98 : 1 }}
+                disabled={status.type === 'loading'}
               >
-                Send Message
+                {status.type === 'loading' ? 'Sending...' : 'Send Message'}
               </motion.button>
             </motion.form>
           </motion.div>
