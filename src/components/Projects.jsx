@@ -129,15 +129,15 @@ const Projects = () => {
                 <div className="flex gap-4">
                   <a 
                     href={project.demoLink} 
-                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4 rounded-2xl transition duration-300 text-center font-medium transform hover:-translate-y-1"
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4 md:px-8 md:py-4 px-4 py-3 rounded-2xl transition duration-300 text-center font-medium transform hover:-translate-y-1 text-sm md:text-base whitespace-nowrap"
                     target="_blank" 
                     rel="noopener noreferrer"
                   >
-                    View Live Demo
+                    View Demo
                   </a>
                   <a 
                     href={project.codeLink} 
-                    className="flex-1 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white border border-gray-700 hover:border-blue-500 px-8 py-4 rounded-2xl transition-all duration-300 text-center font-medium transform hover:-translate-y-1"
+                    className="flex-1 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white border border-gray-700 hover:border-blue-500 px-8 py-4 md:px-8 md:py-4 px-4 py-3 rounded-2xl transition-all duration-300 text-center font-medium transform hover:-translate-y-1 text-sm md:text-base whitespace-nowrap"
                     target="_blank" 
                     rel="noopener noreferrer"
                   >
