@@ -1,13 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-import emailjs from '@emailjs/browser';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
-
-  useEffect(() => {
-    emailjs.init("KZX8haICvARchPn5z");
-  }, []);
-  
   const form = useRef();
   const [formData, setFormData] = useState({
     from_name: '',
@@ -22,32 +16,34 @@ const Contact = () => {
 
   const [status, setStatus] = useState({ type: '', message: '' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setStatus({ type: 'loading', message: 'Sending...' });
     
-    console.log("Form data being sent:", form.current);
-
-    emailjs.sendForm(
-      'service_oxuf6za',
-      'template_tz0jwk8',
-      form.current,
-      'KZX8haICvARchPn5z'
-    )
-      .then((result) => {
-        console.log('Email sent successfully:', result.text);
-        setFormData({ name: '', email: '', message: '' });
+    try {
+      const formData = new FormData(form.current);
+      
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData).toString()
+      });
+      
+      if (response.ok) {
+        console.log('Form submission successful');
+        setFormData({ from_name: '', from_email: '', message: '' });
         setStatus({ type: 'success', message: 'Message sent successfully!' });
         
         setTimeout(() => {
           setStatus({ type: '', message: '' });
         }, 5000);
-      })
-      .catch((error) => {
-
-        console.error('Error sending email:', error);
-        setStatus({ type: 'error', message: `Failed to send message: ` });
-      });
+      } else {
+        throw new Error(`Form submission failed: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setStatus({ type: 'error', message: `Failed to send message. Please try again.` });
+    }
   }
 
   const containerVariants = {
@@ -173,15 +169,23 @@ const Contact = () => {
               ref={form} 
               onSubmit={handleSubmit}
               className="space-y-6"
+              name="contact"
+              method="POST"
+              data-netlify="true"
+              netlify-honeypot="bot-field"
             >
+              <input type="hidden" name="form-name" value="contact" />
+              <p className="hidden">
+                <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+              </p>
+              
               <motion.div variants={inputVariants} whileFocus="focus">
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-400">Your Name</label>
+                <label htmlFor="from_name" className="block mb-2 text-sm font-medium text-gray-400">Your Name</label>
                 <input 
                   type="text" 
-                  id="name" 
-
+                  id="from_name" 
                   name="from_name" 
-                  value={formData.name}
+                  value={formData.from_name}
                   onChange={handleChange}
                   className="w-full p-3 bg-gray-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-600"
                   required
@@ -189,13 +193,12 @@ const Contact = () => {
               </motion.div>
               
               <motion.div variants={inputVariants} whileFocus="focus">
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-400">Your Email</label>
+                <label htmlFor="from_email" className="block mb-2 text-sm font-medium text-gray-400">Your Email</label>
                 <input 
                   type="email" 
-                  id="email" 
-
+                  id="from_email" 
                   name="from_email" 
-                  value={formData.email}
+                  value={formData.from_email}
                   onChange={handleChange}
                   className="w-full p-3 bg-gray-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-600"
                   required
